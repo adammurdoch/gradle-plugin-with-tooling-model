@@ -10,7 +10,6 @@ import java.io.Serializable;
 public abstract class TestPlugin implements Plugin<Project> {
     @Override
     public void apply(Project target) {
-        System.out.println("-> apply test plugin");
         getToolingModelBuilderRegistry().register(new ModelBuilderImpl());
     }
 

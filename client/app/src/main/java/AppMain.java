@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AppMain {
     public static void main(String[] args) throws IOException {
-        System.out.println("-> app!");
+        System.out.println("Running tooling API client");
         GradleConnector connector = GradleConnector.newConnector();
         connector.useGradleVersion("7.4-20211102232306+0000");
         File projectDir = new File("../../testbuild").getCanonicalFile();
@@ -17,6 +17,7 @@ public class AppMain {
             BuildActionExecuter<List<SomeModel>> builder = connection.action(new FetchModels());
             builder.setStandardOutput(System.out);
             builder.setStandardError(System.err);
+//            builder.addArguments("--no-parallel", "-Dorg.gradle.unsafe.isolated-projects=true");
             List<SomeModel> model = builder.run();
             System.out.println("-> model = " + model);
         }
@@ -25,15 +26,24 @@ public class AppMain {
     private static class FetchModels implements BuildAction<List<SomeModel>> {
         @Override
         public List<SomeModel> execute(BuildController controller) {
-            List<SomeModel> result = new ArrayList<>();
+            List<BuildAction<SomeModel>> actions = new ArrayList<>();
             for (BasicGradleProject project : controller.getBuildModel().getProjects()) {
-                System.out.println("-> load from project: " + project);
-                SomeModel model = controller.findModel(project, SomeModel.class);
-                if (model != null) {
-                    result.add(model);
-                }
+                actions.add(new FetchModelForProject(project));
             }
-            return result;
+            return controller.run(actions);
+        }
+
+        private static class FetchModelForProject implements BuildAction<SomeModel> {
+            private final BasicGradleProject project;
+
+            public FetchModelForProject(BasicGradleProject project) {
+                this.project = project;
+            }
+
+            @Override
+            public SomeModel execute(BuildController controller) {
+                return controller.findModel(project, SomeModel.class);
+            }
         }
     }
 }
