@@ -8,7 +8,7 @@ import javax.inject.Inject;
 public abstract class TestPlugin implements Plugin<Project> {
     @Override
     public void apply(Project target) {
-        System.out.println("-> configure project " + target.getPath());
+        System.out.println("-> configure project");
         target.getPlugins().apply("java-library");
         target.getRepositories().mavenCentral();
         getToolingModelBuilderRegistry().register(new ModelBuilderImpl());
