@@ -1,9 +1,9 @@
 import org.apache.commons.cli.*;
-import org.gradle.tooling.*;
-import org.gradle.tooling.model.gradle.BasicGradleProject;
+import org.gradle.tooling.BuildActionExecuter;
+import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.ProjectConnection;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AppMain {
@@ -35,32 +35,11 @@ public class AppMain {
             builder.setStandardOutput(System.out);
             builder.setStandardError(System.err);
             builder.addArguments("--no-parallel", "-Dorg.gradle.unsafe.isolated-projects=true");
-            List<SomeModel> model = builder.run();
-            System.out.println("-> model = " + model);
-        }
-    }
-
-    private static class FetchModels implements BuildAction<List<SomeModel>> {
-        @Override
-        public List<SomeModel> execute(BuildController controller) {
-            List<BuildAction<SomeModel>> actions = new ArrayList<>();
-            for (BasicGradleProject project : controller.getBuildModel().getProjects()) {
-                actions.add(new FetchModelForProject(project));
+            List<SomeModel> models = builder.run();
+            System.out.println("-> models");
+            for (SomeModel model : models) {
+                System.out.println("  project " + model.getPath() + ", compile classpath has " + model.getCompileClasspath().size() + " entries");
             }
-            return controller.run(actions);
-        }
-    }
-
-    private static class FetchModelForProject implements BuildAction<SomeModel> {
-        private final BasicGradleProject project;
-
-        public FetchModelForProject(BasicGradleProject project) {
-            this.project = project;
-        }
-
-        @Override
-        public SomeModel execute(BuildController controller) {
-            return controller.findModel(project, SomeModel.class);
         }
     }
 }
