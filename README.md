@@ -1,7 +1,9 @@
 # Gradle plugin with tooling model
 
-A test app that fetches a simple tooling model. The model contains some basic information about the project, including
-its compile classpath.
+This repository contains a test app that fetches a simple tooling model. The model contains some basic information about the project, including its compile classpath.
+It is intended to be used to test the behaviour of project isolation in Gradle.
+
+### Repository contents
 
 The source is arranged as follows:
 
@@ -27,12 +29,12 @@ To try out the tooling model caching:
 
 - Run the application and note that all projects are configured and all models are created.
 - Run the application again without making any changes and note that no projects are configured or models created.
-- Change the build script for a project and run the application. The modified project should be configured and its model created.
+- Change the build script for a project and run the application. The modified project should be configured and its model created. Other projects should not be configured (subject to the caveats below) and no other models created.
 
 Some things to be aware of with the current implementation for project isolation:
 
-- When a project changes, the settings script is run even if it hasn't changed.
-- When a project changes, it's parent project is configured even if it hasn't changed. The parent project's model is not recreated.
-- When a project that has project dependencies changes, then the targets of the project dependencies are also configured even if they haven't changed (to allow dependency resolution to happen). Their models are not recreated.
-- When the settings file changes, then all cached state is discarded and all project configured and models created.
+- When a project changes, the settings script is always run.
+- When a project changes, its parent project is always configured. The parent project's model is not recreated.
+- When a project that has project dependencies changes, then the targets of the project dependencies are also always configured (to allow dependency resolution to happen). Their models are not recreated. The next milestone will fix this.
+- When the settings file changes, then all project configured and all models created.
 - When a project changes, then some fingerprint entries are discarded. It's best to modify only a single project. You can delete the `testbuild/.gradle/configuration-cache` directory to reset the state if Gradle gets confused.
