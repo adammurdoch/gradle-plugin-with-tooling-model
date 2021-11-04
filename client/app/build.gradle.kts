@@ -16,3 +16,7 @@ dependencies {
 application {
     mainClass.set("AppMain")
 }
+
+tasks.named("run", JavaExec::class.java) {
+    workingDir = file("../..")
+}

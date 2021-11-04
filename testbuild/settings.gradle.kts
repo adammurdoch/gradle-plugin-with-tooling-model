@@ -1,3 +1,5 @@
+println("configuring settings")
+
 includeBuild("../plugin")
 
 include("app")
