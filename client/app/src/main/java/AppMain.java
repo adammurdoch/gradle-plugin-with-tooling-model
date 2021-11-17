@@ -20,15 +20,48 @@ public class AppMain {
         File testBuildDir = locateTestBuild();
 
         System.out.println("Running tooling API client");
-        System.out.println("==========================");
+        System.out.println("====== GRADLE OUTPUT ======");
 
         List<SomeModel> models = fetchModels(installDir, testBuildDir);
 
-        System.out.println("==========================");
+        System.out.println("==== END GRADLE OUTPUT ====");
+        System.out.println();
         System.out.println("Models:");
         for (SomeModel model : models) {
-            System.out.println("  project " + model.getPath() + ", compile classpath has " + model.getCompileClasspath().size() + " entries");
+            System.out.println("  project " + model.getProjectPath());
+            System.out.println("    option: " + model.getOption());
+            System.out.println("    compile classpath: " + format(testBuildDir, model.getCompileClasspath()));
+            System.out.println("    runtime classpath: " + format(testBuildDir, model.getRuntimeClasspath()));
         }
+        System.out.println();
+    }
+
+    private static String format(File rootDir, List<File> files) {
+        if (files.isEmpty()) {
+            return "no files";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        while (i < files.size() && builder.length() < 60) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            File file = files.get(i);
+            if (file.toPath().startsWith(rootDir.toPath())) {
+                builder.append(rootDir.toPath().relativize(file.toPath()));
+            } else {
+                builder.append(file.getName());
+            }
+            i++;
+        }
+        if (i != files.size()) {
+            builder.append(", ...");
+        }
+        builder.append(" (");
+        builder.append(files.size());
+        builder.append(" files total)");
+        return builder.toString();
     }
 
     private static List<SomeModel> fetchModels(File installDir, File testBuildDir) {
