@@ -1,7 +1,10 @@
 # Gradle plugin with tooling model
 
-This repository contains a test app that fetches a simple tooling model. The model contains some basic information about the project, including its compile classpath.
-It is intended to be used to test the behaviour of project isolation in Gradle.
+This repository contains a test app that fetches a simple tooling model.
+It is intended to be used to test the behaviour of [project isolation](https://gradle.github.io/configuration-cache/) in Gradle.
+
+The model contains some basic information about the project, including its compile classpath and a value taken from an
+extension added by the custom plugin.
 
 ### Repository contents
 
@@ -30,6 +33,8 @@ To try out the tooling model caching:
 - Run the application and note that all projects are configured and all models are created.
 - Run the application again without making any changes and note that no projects are configured or models created.
 - Change the build script for a project and run the application. The modified project should be configured and its model created. Other projects should not be configured (subject to the caveats below) and no other models created.
+
+For example, try changing the build script in `lib1/build.gradle.kts`. This project is in the middle of the dependency graph.
 
 Some things to be aware of with the current implementation for project isolation:
 
