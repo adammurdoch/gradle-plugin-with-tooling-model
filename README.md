@@ -38,7 +38,9 @@ The test build has the following dependency graph:
 
 ```
   app +--> lib1 ---> lib3
-      \--> lib2
+      |
+      +--> lib2
+      
   lib4
 ```
 
@@ -55,4 +57,7 @@ Some things to be aware of with the current implementation of project isolation:
 - When any project changes, its parent project is always configured. However, the parent project's model is not recreated.
 - When any project changes, then any other projects that depend on the changed project are also configured and their models created. A later milestone will change this to happen only when the dependency graph of the changed project actually changes.
 - When the settings file changes, then all project configured and all models created.
-- Parallel configuration is disabled. It is still somewhat flaky. A later milestones will fix this.
+- Parallel configuration is disabled. It is still occasionally flaky. A later milestones will fix this.
+
+You can test out parallel configuration and model building by using the `--parallel` option with the test app.
+Note that this also adds a 2 second delay to the test plugin and the model builder, so you can see the effect of parallel configuration.
