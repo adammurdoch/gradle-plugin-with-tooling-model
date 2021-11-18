@@ -14,17 +14,20 @@ public class AppMain {
         Options options = new Options();
         Option installDirOption = new Option(null, "gradle-installation", true, "Gradle installation directory");
         options.addOption(installDirOption);
+        Option parallelOption = new Option(null, "parallel", false, "Fetch models in parallel, also adds some delay");
+        options.addOption(parallelOption);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine = parser.parse(options, args);
 
         File installDir = locateInstallDir(installDirOption, commandLine);
         File testBuildDir = locateTestBuild();
+        boolean parallel = commandLine.hasOption(parallelOption);
 
         System.out.println("Running tooling API client");
         System.out.println("====== GRADLE OUTPUT ======");
 
-        List<SomeModel> models = fetchModels(installDir, testBuildDir);
+        List<SomeModel> models = fetchModels(installDir, testBuildDir, parallel);
 
         System.out.println("==== END GRADLE OUTPUT ====");
         System.out.println();
@@ -66,7 +69,7 @@ public class AppMain {
         return builder.toString();
     }
 
-    private static List<SomeModel> fetchModels(File installDir, File testBuildDir) {
+    private static List<SomeModel> fetchModels(File installDir, File testBuildDir, boolean parallel) {
         GradleConnector connector = GradleConnector.newConnector();
         if (installDir == null) {
             connector.useGradleVersion("7.4-20211118220122+0000");
@@ -78,6 +81,9 @@ public class AppMain {
             BuildActionExecuter<List<SomeModel>> builder = connection.action(new FetchModels());
             builder.setStandardOutput(System.out);
             builder.setStandardError(System.err);
+            if (parallel) {
+                builder.addArguments("--parallel", "-Dtest.delay=2000");
+            }
             Terminals terminals = Native.get(Terminals.class);
             if (terminals.isTerminal(Terminals.Output.Stdout) && terminals.isTerminal(Terminals.Output.Stderr)) {
                 builder.setColorOutput(true);

@@ -17,6 +17,7 @@ class ModelBuilderImpl implements ToolingModelBuilder {
         TestExtension extension = project.getExtensions().getByType(TestExtension.class);
         Set<File> compileClasspath = project.getConfigurations().getByName("compileClasspath").getFiles();
         Set<File> runtimeClasspath = project.getConfigurations().getByName("runtimeClasspath").getFiles();
+        Delay.delay();
         return new DefaultModel(
                 project.getPath(),
                 extension.getOption().get(),

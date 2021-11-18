@@ -14,6 +14,7 @@ public abstract class TestPlugin implements Plugin<Project> {
         TestExtension extension = target.getExtensions().create("model", TestExtension.class);
         extension.getOption().convention(target.getPath().length());
         getToolingModelBuilderRegistry().register(new ModelBuilderImpl());
+        Delay.delay();
     }
 
     @Inject
