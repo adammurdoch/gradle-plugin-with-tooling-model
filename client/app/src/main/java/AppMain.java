@@ -1,3 +1,5 @@
+import net.rubygrapefruit.platform.Native;
+import net.rubygrapefruit.platform.terminal.Terminals;
 import org.apache.commons.cli.*;
 import org.gradle.tooling.BuildActionExecuter;
 import org.gradle.tooling.GradleConnector;
@@ -76,6 +78,10 @@ public class AppMain {
             BuildActionExecuter<List<SomeModel>> builder = connection.action(new FetchModels());
             builder.setStandardOutput(System.out);
             builder.setStandardError(System.err);
+            Terminals terminals = Native.get(Terminals.class);
+            if (terminals.isTerminal(Terminals.Output.Stdout) && terminals.isTerminal(Terminals.Output.Stderr)) {
+                builder.setColorOutput(true);
+            }
             return builder.run();
         }
     }
