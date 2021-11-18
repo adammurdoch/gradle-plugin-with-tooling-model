@@ -34,12 +34,25 @@ To try out the tooling model caching:
 - Run the application again without making any changes and note that no projects are configured or models created.
 - Change the build script for a project and run the application. The modified project should be configured and its model created. Other projects should not be configured (subject to the caveats below) and no other models created.
 
-For example, try changing the build script in `lib1/build.gradle.kts`. This project is in the middle of the dependency graph.
+The test build has the following dependency graph:
 
-Some things to be aware of with the current implementation for project isolation:
+```
+  app +--> lib1 ---> lib3
+      \--> lib2
+  lib4
+```
 
-- When a project changes, the settings script is always run.
-- When a project changes, its parent project is always configured. The parent project's model is not recreated.
-- When a project that has project dependencies changes, then the targets of the project dependencies are also always configured (to allow dependency resolution to happen). Their models are not recreated. The next milestone will fix this.
+Here are some example changes to try:
+
+- Try changing the build script in `lib1/build.gradle.kts`. The project `lib1` will be configured and its model created. The `app` project is also configured because it has a dependency on `lib1`. The `lib3` project is not configured because, although `lib1` depends on it, the cached model and dependency metadata for `lib3` can be reused.
+- Try changing the build script in `app/build.gradle.kts`. The `app` project is configured and its model created. The other projects are not configured because their cached models and dependency metadata can be reused.
+- Try changing the build script in `lib3/build.gradle.kts`. The `app`, `lib1` and `lib3` projects are configured and their models created.
+
+Some things to be aware of with the current implementation of project isolation:
+
+- When any project changes, the settings script is always run.
+- When any project changes, `buildSrc` and plugins in included builds are rebuilt. A later milestone will fix this.
+- When any project changes, its parent project is always configured. However, the parent project's model is not recreated.
+- When any project changes, then any other projects that depend on the changed project are also configured and their models created. A later milestone will change this to happen only when the dependency graph of the changed project actually changes.
 - When the settings file changes, then all project configured and all models created.
-- When a project changes, then some fingerprint entries are discarded. It's best to modify only a single project. You can delete the `testbuild/.gradle/configuration-cache` directory to reset the state if Gradle gets confused.
+- Parallel configuration is disabled. It is still somewhat flaky. A later milestones will fix this.
