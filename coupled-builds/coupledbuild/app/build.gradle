@@ -5,3 +5,7 @@ plugins {
 project(":lib1") {
     plugins.apply(TestPlugin.class)
 }
+
+options {
+    option = 10
+}
