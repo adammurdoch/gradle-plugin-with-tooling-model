@@ -1,4 +1,5 @@
 import net.rubygrapefruit.platform.Native;
+import net.rubygrapefruit.platform.NativeIntegrationUnavailableException;
 import net.rubygrapefruit.platform.terminal.Terminals;
 import org.apache.commons.cli.*;
 import org.gradle.tooling.BuildActionExecuter;
@@ -16,12 +17,14 @@ public class AppMain {
         options.addOption(installDirOption);
         Option parallelOption = new Option(null, "parallel", false, "Fetch models in parallel, also adds some delay");
         options.addOption(parallelOption);
+        Option buildOption = new Option(null, "build", true, "The Gradle build to fetch models for");
+        options.addOption(buildOption);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine = parser.parse(options, args);
 
         File installDir = locateInstallDir(installDirOption, commandLine);
-        File testBuildDir = locateTestBuild();
+        File testBuildDir = locateTestBuild(buildOption, commandLine);
         boolean parallel = commandLine.hasOption(parallelOption);
 
         System.out.println("Running tooling API client");
@@ -84,8 +87,7 @@ public class AppMain {
             if (parallel) {
                 builder.addArguments("--parallel", "-Dtest.delay=2000");
             }
-            Terminals terminals = Native.get(Terminals.class);
-            if (terminals.isTerminal(Terminals.Output.Stdout) && terminals.isTerminal(Terminals.Output.Stderr)) {
+            if (isTerminal()) {
                 builder.setColorOutput(true);
             }
             return builder.run();
@@ -100,7 +102,21 @@ public class AppMain {
         }
     }
 
-    private static File locateTestBuild() throws IOException {
-        return new File("testbuild").getCanonicalFile();
+    private static File locateTestBuild(Option buildOption, CommandLine commandLine) throws IOException {
+        if (commandLine.hasOption(buildOption)) {
+            return new File(commandLine.getOptionValue(buildOption));
+        } else {
+            return new File("testbuild").getCanonicalFile();
+        }
+    }
+
+    private static boolean isTerminal() {
+        try {
+            Terminals terminals = Native.get(Terminals.class);
+            return terminals.isTerminal(Terminals.Output.Stdout) && terminals.isTerminal(Terminals.Output.Stderr);
+        } catch (NativeIntegrationUnavailableException e) {
+            // Ignore
+            return false;
+        }
     }
 }
