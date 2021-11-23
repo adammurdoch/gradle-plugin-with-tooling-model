@@ -8,10 +8,10 @@ import javax.inject.Inject;
 public abstract class TestPlugin implements Plugin<Project> {
     @Override
     public void apply(Project target) {
-        System.out.println("apply test plugin");
+        System.out.println("apply test plugin to " + target);
         target.getPlugins().apply("java-library");
         target.getRepositories().mavenCentral();
-        TestExtension extension = target.getExtensions().create("model", TestExtension.class);
+        TestExtension extension = target.getExtensions().create("options", TestExtension.class);
         extension.getOption().convention(target.getPath().length());
         getToolingModelBuilderRegistry().register(new ModelBuilderImpl());
         Delay.delay();

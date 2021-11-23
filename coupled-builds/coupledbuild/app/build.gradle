@@ -1,0 +1,7 @@
+plugins {
+    id("test.plugin")
+}
+
+project(":lib1") {
+    plugins.apply(TestPlugin.class)
+}

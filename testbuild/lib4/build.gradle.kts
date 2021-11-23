@@ -2,6 +2,6 @@ plugins {
     id("test.plugin")
 }
 
-model {
+options {
     option.set(4)
 }
