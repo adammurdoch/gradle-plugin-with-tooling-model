@@ -1,3 +1,7 @@
 plugins {
     id("test.plugin")
 }
+
+options {
+    option = 4
+}

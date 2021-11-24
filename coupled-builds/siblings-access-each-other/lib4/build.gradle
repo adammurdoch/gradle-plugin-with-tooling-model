@@ -1,0 +1,7 @@
+plugins {
+    id("test.plugin")
+}
+
+options {
+    option = project(":lib3").options.option.map { it * 2 }
+}

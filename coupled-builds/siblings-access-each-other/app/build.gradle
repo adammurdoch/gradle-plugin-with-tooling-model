@@ -14,7 +14,7 @@ project(":lib1") {
 }
 
 options {
-    option = 10
+    option = 1
 }
 
 dependencies {
