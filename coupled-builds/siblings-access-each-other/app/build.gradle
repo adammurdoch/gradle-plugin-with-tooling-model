@@ -1,0 +1,22 @@
+
+plugins {
+    id("test.plugin")
+}
+
+/**
+ * Injects plugin and dependency into "lib1" project, but does not depend on it.
+ */
+project(":lib1") {
+    plugins.apply(TestPlugin.class)
+    dependencies {
+        implementation project(":lib3")
+    }
+}
+
+options {
+    option = 10
+}
+
+dependencies {
+    implementation project(":lib2")
+}

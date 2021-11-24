@@ -1,0 +1,5 @@
+/**
+ * Assumes plugin has been applied to this project and 'app' project
+ */
+
+options.option = project(":app").options.option.map { it * 2 }

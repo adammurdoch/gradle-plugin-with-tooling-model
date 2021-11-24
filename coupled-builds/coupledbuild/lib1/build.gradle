@@ -1,2 +1,0 @@
-
-options.option = project(":app").options.option
