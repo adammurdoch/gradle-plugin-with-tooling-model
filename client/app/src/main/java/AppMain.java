@@ -75,7 +75,7 @@ public class AppMain {
     private static List<SomeModel> fetchModels(File installDir, File testBuildDir, boolean parallel) {
         GradleConnector connector = GradleConnector.newConnector();
         if (installDir == null) {
-            connector.useGradleVersion("7.4-20211118220122+0000");
+            connector.useGradleVersion("7.4-20211201142612+0000");
         } else {
             connector.useInstallation(installDir);
         }
